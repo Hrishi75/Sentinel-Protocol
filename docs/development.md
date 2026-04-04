@@ -57,7 +57,7 @@ anchor test --provider.cluster devnet --skip-local-validator
 
 ### Test Coverage
 
-The test suite in `tests/warden-protocol.ts` covers:
+The test suite in `tests/sentinel-protocol.ts` covers:
 1. DAO initialization with members and config
 2. Agent registration with stake bond
 3. Agent arrest with violation evidence
@@ -72,7 +72,7 @@ The test suite in `tests/warden-protocol.ts` covers:
 ## Running the Demo Simulation
 
 
-The agent simulator runs the full Warden Protocol lifecycle:
+The agent simulator runs the full Sentinel Protocol lifecycle:
 
 ```bash
 cd agent-sim
@@ -88,7 +88,7 @@ npx ts-node src/demo-flow.ts
 | 2 | Deploy AI Agent | 1 SOL bond, 0.1 SOL transfer limit |
 | 3 | Normal Operations | 3 transfers within limits |
 | 4 | Agent Goes Rogue | 0.5 SOL transfer (5x the limit) |
-| 5 | Warden Containment | Agent arrested, Cell created |
+| 5 | Sentinel Containment | Agent arrested, Cell created |
 | 6 | Owner Posts Bail | 0.5 SOL bail, review window opens |
 | 7 | Council Votes | 2/3 vote Parole |
 | 8 | Agent Released | Paroled: reduced limits, 3 strikes |

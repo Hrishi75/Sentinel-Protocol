@@ -6,7 +6,7 @@ Instruction-level behavior, account models, and governance/economic mechanics.
 
 | Instruction | Description |
 |-------------|-------------|
-| `init_dao` | Initialize the Warden DAO with members, voting threshold, and config |
+| `init_dao` | Initialize the Sentinel DAO with members, voting threshold, and config |
 | `register_agent` | Onboard an AI agent with staked SOL bond and permission scope |
 | `arrest_agent` | Freeze an agent — sets status to Arrested, creates Cell, logs violation |
 | `freeze_agent_token` | Freeze an agent's SPL token accounts via CPI |
@@ -23,7 +23,7 @@ Instruction-level behavior, account models, and governance/economic mechanics.
 
 ### init_dao
 
-Initializes the Warden DAO singleton. Must be called once before any other instruction.
+Initializes the Sentinel DAO singleton. Must be called once before any other instruction.
 
 **Parameters:**
 | Name | Type | Description |
@@ -38,7 +38,7 @@ Initializes the Warden DAO singleton. Must be called once before any other instr
 | Name | Type | Description |
 |------|------|-------------|
 | `authority` | `Signer` | DAO initializer (becomes authority) |
-| `warden_dao` | `Account<WardenDao>` | PDA `["warden_dao"]` — initialized |
+| `sentinel_dao` | `Account<SentinelDao>` | PDA `["sentinel_dao"]` — initialized |
 | `treasury` | `UncheckedAccount` | Treasury to receive slashed funds |
 | `system_program` | `Program<System>` | System program |
 
@@ -78,7 +78,7 @@ Arrests an active or paroled agent. Creates a Cell account and logs the violatio
 | `arrester` | `Signer` | Must be a DAO member or the agent owner |
 | `agent_record` | `Account<AgentRecord>` | Must be Active or Paroled |
 | `cell` | `Account<Cell>` | PDA `["cell", agent_record]` — initialized |
-| `warden_dao` | `Account<WardenDao>` | DAO config for member validation |
+| `sentinel_dao` | `Account<SentinelDao>` | DAO config for member validation |
 | `token_program` | `Program<Token>` | SPL Token program |
 | `system_program` | `Program<System>` | System program |
 
@@ -94,7 +94,7 @@ Freezes an arrested agent's SPL token account via CPI to the Token Program.
 | `authority` | `Signer` | Caller |
 | `agent_record` | `Account<AgentRecord>` | Must be Arrested |
 | `cell` | `Account<Cell>` | Associated Cell account |
-| `warden_dao` | `Account<WardenDao>` | Signs as freeze authority |
+| `sentinel_dao` | `Account<SentinelDao>` | Signs as freeze authority |
 | `token_account` | `Account<TokenAccount>` | Token account to freeze |
 | `mint` | `Account<Mint>` | Token mint |
 | `token_program` | `Program<Token>` | SPL Token program |
@@ -116,7 +116,7 @@ Owner stakes additional SOL to open an appeal review window.
 | `cell` | `Account<Cell>` | Must not have bail already posted |
 | `bail_request` | `Account<BailRequest>` | PDA `["bail", cell]` — initialized |
 | `bail_vault` | `SystemAccount` | PDA `["bail_vault", bail_request]` — receives bail |
-| `warden_dao` | `Account<WardenDao>` | For min_bail and review window config |
+| `sentinel_dao` | `Account<SentinelDao>` | For min_bail and review window config |
 | `system_program` | `Program<System>` | System program |
 
 **Effects:** BailRequest created with review deadline, bail SOL transferred to vault, Cell marked as `bail_posted = true`.
@@ -137,7 +137,7 @@ DAO member votes on a pending bail request. Uses eager-tally — resolves immedi
 | `bail_request` | `Account<BailRequest>` | Must be Pending |
 | `cell` | `Account<Cell>` | Associated Cell |
 | `agent_record` | `Account<AgentRecord>` | Associated agent |
-| `warden_dao` | `Account<WardenDao>` | For member validation and threshold |
+| `sentinel_dao` | `Account<SentinelDao>` | For member validation and threshold |
 
 ### release_agent
 
@@ -153,7 +153,7 @@ Executes the resolved voting outcome.
 | `bail_vault` | `SystemAccount` | Bail funds source |
 | `stake_vault` | `SystemAccount` | Agent stake source |
 | `owner` | `SystemAccount` | Receives returned bail/stake |
-| `warden_dao` | `Account<WardenDao>` | For slash config |
+| `sentinel_dao` | `Account<SentinelDao>` | For slash config |
 | `treasury` | `SystemAccount` | Receives slashed funds |
 | `system_program` | `Program<System>` | System program |
 
@@ -181,7 +181,7 @@ Reports a parole violation. Decrements strikes and may trigger auto re-arrest.
 |------|------|-------------|
 | `reporter` | `Signer` | Must be a DAO member or agent owner |
 | `agent_record` | `Account<AgentRecord>` | Must be Paroled |
-| `warden_dao` | `Account<WardenDao>` | For member validation |
+| `sentinel_dao` | `Account<SentinelDao>` | For member validation |
 | `system_program` | `Program<System>` | System program |
 
 **Effects:** Violation added to rap sheet, `strikes_remaining` decremented. If strikes reach 0 → auto re-arrest.
@@ -226,7 +226,7 @@ Created when the owner posts bail:
 - Vote records with stake-weighted tallies
 - Outcome: `Pending` | `Released` | `Paroled` | `Terminated`
 
-### WardenDAO — `PDA["warden_dao"]` (singleton)
+### SentinelDAO — `PDA["sentinel_dao"]` (singleton)
 
 DAO configuration:
 - Member list with stakes
@@ -255,7 +255,7 @@ DAO configuration:
 
 When an agent is arrested, its SPL token accounts can be frozen:
 
-1. At registration, agent token accounts are created under mints where the Warden DAO PDA is the **freeze authority**
+1. At registration, agent token accounts are created under mints where the Sentinel DAO PDA is the **freeze authority**
 2. On arrest, `freeze_agent_token` issues a CPI to `spl_token::freeze_account`
 3. On release, a corresponding `thaw_account` CPI unfreezes the accounts
 4. If terminated, accounts remain frozen permanently
@@ -280,6 +280,6 @@ Voting uses an eager-tally approach:
 - First agent-native accountability primitive on Solana
 - Stake-slashing creates real economic consequences for bad agent behavior
 - Parole mode is a genuinely new primitive — not binary freeze/unfreeze
-- Composable — any protocol can integrate Warden to govern their agents
+- Composable — any protocol can integrate Sentinel to govern their agents
 - Directly addresses the biggest unsolved problem in the agentic AI stack
 

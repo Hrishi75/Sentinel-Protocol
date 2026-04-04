@@ -24,8 +24,8 @@ Use this guide for prerequisites and local/Docker installation.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/warden-protocol.git
-cd warden-protocol
+git clone https://github.com/your-username/sentinel-protocol.git
+cd sentinel-protocol
 ```
 
 ### 2. Install Dependencies
@@ -123,7 +123,7 @@ volumes:
 ### Docker Files
 
 ```
-warden-protocol/
+sentinel-protocol/
 ├── docker-compose.yml              # Orchestrates all services
 ├── .dockerignore                    # Excludes node_modules, target, .next
 └── docker/

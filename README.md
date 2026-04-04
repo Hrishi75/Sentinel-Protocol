@@ -1,8 +1,8 @@
-﻿# Warden Protocol
+﻿# Sentinel Protocol
 
 **On-chain accountability and containment system for autonomous AI agents on Solana.**
 
-Warden Protocol gives developers, DAOs, and protocols a structured way to monitor, freeze, penalize, and reinstate AI agents that operate with real on-chain permissions and funds.
+Sentinel Protocol gives developers, DAOs, and protocols a structured way to monitor, freeze, penalize, and reinstate AI agents that operate with real on-chain permissions and funds.
 
 ## Documentation
 
@@ -19,8 +19,8 @@ Warden Protocol gives developers, DAOs, and protocols a structured way to monito
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-username/warden-protocol.git
-cd warden-protocol
+git clone https://github.com/your-username/sentinel-protocol.git
+cd sentinel-protocol
 npm install
 cd app && npm install && cd ..
 ```

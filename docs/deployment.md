@@ -11,15 +11,15 @@ anchor build
 ```
 
 This produces:
-- `target/deploy/warden_protocol.so` — Deployable BPF binary
-- `target/deploy/warden_protocol-keypair.json` — Program keypair
-- `target/idl/warden_protocol.json` — IDL for client generation
-- `target/types/warden_protocol.ts` — TypeScript types
+- `target/deploy/sentinel_protocol.so` — Deployable BPF binary
+- `target/deploy/sentinel_protocol-keypair.json` — Program keypair
+- `target/idl/sentinel_protocol.json` — IDL for client generation
+- `target/types/sentinel_protocol.ts` — TypeScript types
 
 ### Step 2: Verify Program ID
 
 ```bash
-solana address -k target/deploy/warden_protocol-keypair.json
+solana address -k target/deploy/sentinel_protocol-keypair.json
 ```
 
 This should output:
@@ -31,8 +31,8 @@ If it's **different**, update the ID in three places:
 
 | File | Location |
 |------|----------|
-| `Anchor.toml` | Line 8: `warden_protocol = "YOUR_ID"` |
-| `programs/warden-protocol/src/lib.rs` | Line 11: `declare_id!("YOUR_ID")` |
+| `Anchor.toml` | Line 8: `sentinel_protocol = "YOUR_ID"` |
+| `programs/sentinel-protocol/src/lib.rs` | Line 11: `declare_id!("YOUR_ID")` |
 | `app/src/lib/program.ts` | Line 7-9: `PROGRAM_ID = new PublicKey("YOUR_ID")` |
 
 Then rebuild: `anchor build`
@@ -45,7 +45,7 @@ anchor deploy
 
 Expected output:
 ```
-Deploying program "warden_protocol"...
+Deploying program "sentinel_protocol"...
 Program Id: 5DCbrjFHUdzLHLayUUdFJBnBPC8UV7eUc3wJA1rVRQTa
 Deploy success
 ```
@@ -60,7 +60,7 @@ https://explorer.solana.com/address/5DCbrjFHUdzLHLayUUdFJBnBPC8UV7eUc3wJA1rVRQTa
 ### Upgrading an Existing Deployment
 
 ```bash
-anchor upgrade target/deploy/warden_protocol.so \
+anchor upgrade target/deploy/sentinel_protocol.so \
   --program-id 5DCbrjFHUdzLHLayUUdFJBnBPC8UV7eUc3wJA1rVRQTa \
   --provider.cluster devnet
 ```
@@ -75,7 +75,7 @@ anchor upgrade target/deploy/warden_protocol.so \
 ```
 
 Defined in:
-- `programs/warden-protocol/src/lib.rs` — `declare_id!` macro
+- `programs/sentinel-protocol/src/lib.rs` — `declare_id!` macro
 - `app/src/lib/program.ts` — Frontend `PROGRAM_ID`
 - `Anchor.toml` — Anchor config
 
