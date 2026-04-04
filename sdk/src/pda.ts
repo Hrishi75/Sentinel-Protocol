@@ -3,7 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 const AGENT_SEED = Buffer.from("agent");
 const CELL_SEED = Buffer.from("cell");
 const BAIL_SEED = Buffer.from("bail");
-const DAO_SEED = Buffer.from("warden_dao");
+const DAO_SEED = Buffer.from("sentinel_dao");
 const VAULT_SEED = Buffer.from("vault");
 const BAIL_VAULT_SEED = Buffer.from("bail_vault");
 
@@ -37,7 +37,7 @@ export function findBailRequestPda(
   );
 }
 
-export function findWardenDaoPda(
+export function findSentinelDaoPda(
   programId: PublicKey
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync([DAO_SEED], programId);
