@@ -6,14 +6,14 @@ System architecture, repository layout, and account/state design.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    WARDEN PROTOCOL                       │
+│                    SENTINEL PROTOCOL                       │
 ├──────────┬──────────┬───────────┬───────────┬───────────┤
 │ Register │  Arrest  │ Post Bail │ DAO Vote  │  Release  │
 │  Agent   │  Agent   │           │           │  Agent    │
 ├──────────┴──────────┴───────────┴───────────┴───────────┤
 │              Solana Program (Anchor/Rust)                 │
 ├─────────────────────────────────────────────────────────┤
-│  AgentRecord PDA │ Cell PDA │ BailRequest │ WardenDAO   │
+│  AgentRecord PDA │ Cell PDA │ BailRequest │ SentinelDAO   │
 └─────────────────────────────────────────────────────────┘
          │                          │
     ┌────┴────┐              ┌──────┴──────┐
@@ -33,14 +33,14 @@ System architecture, repository layout, and account/state design.
 
 
 ```
-warden-protocol/
-├── programs/warden-protocol/src/       # Solana program (Rust/Anchor)
+sentinel-protocol/
+├── programs/sentinel-protocol/src/       # Solana program (Rust/Anchor)
 │   ├── lib.rs                          # Program entrypoint, declare_id
 │   ├── state/                          # Account structs
 │   │   ├── agent.rs                    # AgentRecord, PermissionScope, Violation
 │   │   ├── cell.rs                     # Cell (arrest context)
 │   │   ├── bail.rs                     # BailRequest, VoteRecord, BailOutcome
-│   │   └── dao.rs                      # WardenDao, DaoMember
+│   │   └── dao.rs                      # SentinelDao, DaoMember
 │   ├── instructions/                   # All 9 instructions
 │   │   ├── init_dao.rs
 │   │   ├── register_agent.rs
@@ -76,7 +76,7 @@ warden-protocol/
 │   ├── rogue-agent.ts                  # Simulated rogue AI agent
 │   └── warden-monitor.ts              # Off-chain violation detector
 ├── tests/                              # Anchor integration tests
-│   └── warden-protocol.ts
+│   └── sentinel-protocol.ts
 ├── docker/                             # Docker configuration
 │   ├── solana/Dockerfile               # Rust + Solana + Anchor
 │   ├── solana/entrypoint.sh            # Deploy automation script
@@ -94,7 +94,7 @@ warden-protocol/
 
 | Account | Seeds | Lifetime |
 |---------|-------|----------|
-| `WardenDao` | `["warden_dao"]` | Permanent (singleton) |
+| `SentinelDao` | `["sentinel_dao"]` | Permanent (singleton) |
 | `AgentRecord` | `["agent", agent_pubkey]` | Permanent |
 | `Cell` | `["cell", agent_record_pda]` | Created on arrest, closed on release |
 | `BailRequest` | `["bail", cell_pda]` | Created on bail, closed on release |

@@ -95,7 +95,7 @@ export interface DaoMember {
   isActive: boolean;
 }
 
-export interface WardenDao {
+export interface SentinelDao {
   authority: PublicKey;
   members: DaoMember[];
   voteThreshold: number;

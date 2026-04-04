@@ -38,11 +38,11 @@ solana airdrop 2
 
 ```bash
 # Check the generated key
-solana address -k target/deploy/warden_protocol-keypair.json
+solana address -k target/deploy/sentinel_protocol-keypair.json
 
 # Update all three locations if different:
 # 1. Anchor.toml → [programs.devnet]
-# 2. programs/warden-protocol/src/lib.rs → declare_id!
+# 2. programs/sentinel-protocol/src/lib.rs → declare_id!
 # 3. app/src/lib/program.ts → PROGRAM_ID
 
 # Rebuild after updating

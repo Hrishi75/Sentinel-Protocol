@@ -23,7 +23,7 @@ All protected pages require wallet connection + operative registration via the A
 ## Custom Auth System
 
 
-Warden Protocol uses a **wallet-based identity system** called "Operative Identity" — no backend required.
+Sentinel Protocol uses a **wallet-based identity system** called "Operative Identity" — no backend required.
 
 ### How It Works
 

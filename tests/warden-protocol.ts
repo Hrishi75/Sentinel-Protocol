@@ -3,13 +3,13 @@ import { Program } from "@coral-xyz/anchor";
 import { PublicKey, Keypair, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { expect } from "chai";
-import { WardenProtocol } from "../target/types/warden_protocol";
+import { SentinelProtocol } from "../target/types/sentinel_protocol";
 
-describe("warden-protocol", () => {
+describe("sentinel-protocol", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.WardenProtocol as Program<WardenProtocol>;
+  const program = anchor.workspace.SentinelProtocol as Program<SentinelProtocol>;
   const programId = program.programId;
 
   // Test wallets
@@ -22,8 +22,8 @@ describe("warden-protocol", () => {
   const treasury = Keypair.generate();
 
   // PDAs
-  let wardenDaoPda: PublicKey;
-  let wardenDaoBump: number;
+  let sentinelDaoPda: PublicKey;
+  let sentinelDaoBump: number;
   let agentRecordPda: PublicKey;
   let agentRecordBump: number;
   let vaultPda: PublicKey;
@@ -33,8 +33,8 @@ describe("warden-protocol", () => {
 
   before(async () => {
     // Derive PDAs
-    [wardenDaoPda, wardenDaoBump] = PublicKey.findProgramAddressSync(
-      [Buffer.from("warden_dao")],
+    [sentinelDaoPda, sentinelDaoBump] = PublicKey.findProgramAddressSync(
+      [Buffer.from("sentinel_dao")],
       programId
     );
 
@@ -72,7 +72,7 @@ describe("warden-protocol", () => {
   });
 
   describe("DAO Initialization", () => {
-    it("initializes the Warden DAO", async () => {
+    it("initializes the Sentinel DAO", async () => {
       const initialMembers = [
         { wallet: daoMember1.publicKey, stake: new anchor.BN(1_000_000_000), isActive: true },
         { wallet: daoMember2.publicKey, stake: new anchor.BN(1_000_000_000), isActive: true },
@@ -89,13 +89,13 @@ describe("warden-protocol", () => {
         )
         .accounts({
           authority: daoAuthority.publicKey,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
           treasury: treasury.publicKey,
           systemProgram: SystemProgram.programId,
         })
         .rpc();
 
-      const dao = await program.account.wardenDao.fetch(wardenDaoPda);
+      const dao = await program.account.sentinelDao.fetch(sentinelDaoPda);
       expect(dao.authority.toString()).to.equal(daoAuthority.publicKey.toString());
       expect(dao.members.length).to.equal(3);
       expect(dao.voteThreshold).to.equal(51);
@@ -150,7 +150,7 @@ describe("warden-protocol", () => {
           arrester: daoMember1.publicKey,
           agentRecord: agentRecordPda,
           cell: cellPda,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
@@ -180,7 +180,7 @@ describe("warden-protocol", () => {
           cell: cellPda,
           bailRequest: bailRequestPda,
           bailVault: bailVaultPda,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
           systemProgram: SystemProgram.programId,
         })
         .signers([agentOwner])
@@ -203,7 +203,7 @@ describe("warden-protocol", () => {
           bailRequest: bailRequestPda,
           cell: cellPda,
           agentRecord: agentRecordPda,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
         })
         .signers([daoMember1])
         .rpc();
@@ -223,7 +223,7 @@ describe("warden-protocol", () => {
           bailRequest: bailRequestPda,
           cell: cellPda,
           agentRecord: agentRecordPda,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
         })
         .signers([daoMember2])
         .rpc();
@@ -248,7 +248,7 @@ describe("warden-protocol", () => {
           bailVault: bailVaultPda,
           stakeVault: vaultPda,
           owner: agentOwner.publicKey,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
           treasury: treasury.publicKey,
           systemProgram: SystemProgram.programId,
         })
@@ -277,7 +277,7 @@ describe("warden-protocol", () => {
         .accounts({
           reporter: daoMember1.publicKey,
           agentRecord: agentRecordPda,
-          wardenDao: wardenDaoPda,
+          sentinelDao: sentinelDaoPda,
           systemProgram: SystemProgram.programId,
         })
         .signers([daoMember1])
