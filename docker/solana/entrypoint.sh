@@ -2,7 +2,7 @@
 set -e
 
 echo "========================================"
-echo "  WARDEN PROTOCOL — SOLANA DEPLOYER"
+echo "  SENTINEL PROTOCOL — SOLANA DEPLOYER"
 echo "========================================"
 
 # Check if a wallet keypair was mounted
@@ -43,14 +43,14 @@ echo "[+] Building program..."
 anchor build
 
 # Verify program keypair
-PROGRAM_KEY=$(solana address -k target/deploy/warden_protocol-keypair.json)
+PROGRAM_KEY=$(solana address -k target/deploy/sentinel_protocol-keypair.json)
 echo "[+] Program ID: $PROGRAM_KEY"
 
 # Check if already deployed
 echo "[+] Checking if program is already deployed..."
 if solana program show $PROGRAM_KEY 2>/dev/null | grep -q "Program Id"; then
     echo "[+] Program already deployed, upgrading..."
-    anchor upgrade target/deploy/warden_protocol.so --program-id $PROGRAM_KEY --provider.cluster $CLUSTER
+    anchor upgrade target/deploy/sentinel_protocol.so --program-id $PROGRAM_KEY --provider.cluster $CLUSTER
 else
     echo "[+] Deploying program to $CLUSTER..."
     anchor deploy --provider.cluster $CLUSTER
@@ -66,8 +66,8 @@ echo "========================================"
 
 # Copy IDL for frontend to pick up
 if [ -d /warden/shared ]; then
-    cp target/idl/warden_protocol.json /warden/shared/
-    cp target/types/warden_protocol.ts /warden/shared/
+    cp target/idl/sentinel_protocol.json /warden/shared/
+    cp target/types/sentinel_protocol.ts /warden/shared/
     echo "[+] IDL copied to shared volume"
 fi
 
