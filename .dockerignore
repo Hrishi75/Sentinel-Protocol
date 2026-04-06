@@ -1,0 +1,36 @@
+# Dependencies
+node_modules
+app/node_modules
+
+# Build outputs
+target
+app/.next
+app/out
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
+.env*.local
+
+# Docker
+docker-compose.yml
+.dockerignore
+
+# Docs
+*.md
+!README.md
+LICENSE
