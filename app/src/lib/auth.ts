@@ -1,5 +1,6 @@
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import bs58 from "bs58";
+import { fetchProfile, saveProfileToServer, deleteProfileFromServer } from "./profile-api";
 
 export type Faction = "sentinel" | "vanguard" | "phantom";
 
@@ -62,6 +63,8 @@ export async function signAndCreateProfile(
   };
 
   saveProfile(profile);
+  // Persist to server (fire-and-forget, localStorage is the primary during registration)
+  saveProfileToServer(profile).catch(() => {});
   return profile;
 }
 
@@ -87,6 +90,21 @@ export function loadProfile(walletAddress: string): OperativeProfile | null {
   }
 }
 
+/** Load profile with server fallback — use when localStorage may be empty (new device/browser). */
+export async function loadProfileAsync(walletAddress: string): Promise<OperativeProfile | null> {
+  // Try localStorage first (fast)
+  const local = loadProfile(walletAddress);
+  if (local) return local;
+
+  // Fallback to server
+  const remote = await fetchProfile(walletAddress);
+  if (remote) {
+    // Cache locally for next time
+    saveProfile(remote);
+  }
+  return remote;
+}
+
 export function saveProfile(profile: OperativeProfile): void {
   try {
     localStorage.setItem(
@@ -96,6 +114,8 @@ export function saveProfile(profile: OperativeProfile): void {
   } catch {
     console.error("Failed to save operative profile to localStorage");
   }
+  // Dual-write to server
+  saveProfileToServer(profile).catch(() => {});
 }
 
 export function deleteProfile(walletAddress: string): void {
@@ -104,6 +124,8 @@ export function deleteProfile(walletAddress: string): void {
   } catch {
     console.error("Failed to delete operative profile from localStorage");
   }
+  // Also delete from server
+  deleteProfileFromServer(walletAddress).catch(() => {});
 }
 
 export function isAuthenticated(walletAddress: string): boolean {
@@ -212,20 +234,23 @@ export function unlinkWallet(
   return updated;
 }
 
-export const FACTION_INFO: Record<Faction, { name: string; color: string; description: string }> = {
+export const FACTION_INFO: Record<Faction, { name: string; color: string; description: string; plainDescription: string }> = {
   sentinel: {
     name: "SENTINEL",
     color: "#00E5CC",
     description: "Guardians of protocol integrity. Specialize in monitoring and enforcement.",
+    plainDescription: "Monitors AI agents for rule violations and ensures they stay within their approved limits.",
   },
   vanguard: {
     name: "VANGUARD",
     color: "#FF9B26",
     description: "First responders. Lead the charge in agent containment operations.",
+    plainDescription: "First to respond when an AI agent misbehaves — flags issues and initiates reviews.",
   },
   phantom: {
     name: "PHANTOM",
     color: "#6C5CE7",
     description: "Covert operatives. Masters of intelligence gathering and surveillance.",
+    plainDescription: "Tracks AI agent activity behind the scenes and gathers evidence for governance votes.",
   },
 };
