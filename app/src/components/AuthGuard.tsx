@@ -26,8 +26,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.4 }}
       >
         <div className="hud-frame text-center p-12">
-          <div className="w-8 h-8 border-2 border-warden-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-mono text-warden-cyan text-sm tracking-widest uppercase animate-neon-pulse">
+          <div className="w-8 h-8 border-2 border-sentinel-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="font-mono text-sentinel-cyan text-sm tracking-widest uppercase animate-neon-pulse">
             Verifying clearance...
           </p>
         </div>
@@ -74,8 +74,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         transition={{ duration: 0.4 }}
       >
         <div className="hud-frame text-center p-12">
-          <div className="w-8 h-8 border-2 border-warden-orange border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-mono text-warden-orange text-sm tracking-widest uppercase">
+          <div className="w-8 h-8 border-2 border-sentinel-orange border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="font-mono text-sentinel-orange text-sm tracking-widest uppercase">
             Redirecting to registration terminal...
           </p>
         </div>

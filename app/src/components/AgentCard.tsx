@@ -8,6 +8,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 interface AgentCardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   agent: any;
+  insuranceTier?: "Basic" | "Standard" | "Premium" | null;
   onClick?: () => void;
 }
 
@@ -18,7 +19,13 @@ const statusBorderColors: Record<string, string> = {
   Terminated: "rgba(107, 114, 128, 0.2)",
 };
 
-export function AgentCard({ agent, onClick }: AgentCardProps) {
+const tierColors: Record<string, string> = {
+  Basic: "#00E5CC",
+  Standard: "#FF9B26",
+  Premium: "#6C5CE7",
+};
+
+export function AgentCard({ agent, insuranceTier, onClick }: AgentCardProps) {
   const status = getStatusFromAccount(agent.status);
   const identity = agent.agentIdentity.toBase58();
   const borderColor = statusBorderColors[status] || "rgba(0, 229, 204, 0.2)";
@@ -59,22 +66,39 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
 
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-white font-mono text-sm tracking-wider">
-          {identity.slice(0, 4)}...{identity.slice(-4)}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-white font-mono text-sm tracking-wider">
+            {identity.slice(0, 4)}...{identity.slice(-4)}
+          </h3>
+          {insuranceTier && (
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 font-mono text-[8px] font-bold tracking-wider"
+              style={{
+                color: tierColors[insuranceTier],
+                border: `1px solid ${tierColors[insuranceTier]}40`,
+                background: `${tierColors[insuranceTier]}10`,
+              }}
+            >
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
+              </svg>
+              {insuranceTier.toUpperCase()}
+            </span>
+          )}
+        </div>
         <StatusBadge status={status} />
       </div>
 
       {/* Stats */}
       <div className="space-y-2.5 font-mono text-xs">
         <div className="flex justify-between">
-          <span className="text-gray-600 tracking-wider">BOND</span>
-          <span className="text-warden-cyan">
+          <span className="text-gray-600 tracking-wider">DEPOSIT</span>
+          <span className="text-sentinel-cyan">
             {(agent.stakeAmount.toNumber() / LAMPORTS_PER_SOL).toFixed(2)} SOL
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600 tracking-wider">INCIDENTS</span>
+          <span className="text-gray-600 tracking-wider">VIOLATIONS</span>
           <span
             className={
               agent.violations.length > 0
@@ -86,7 +110,7 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600 tracking-wider">TRANSFER CEILING</span>
+          <span className="text-gray-600 tracking-wider">MAX TRANSFER</span>
           <span className="text-gray-400">
             {(
               agent.permissions.maxTransferLamports.toNumber() /
@@ -98,7 +122,7 @@ export function AgentCard({ agent, onClick }: AgentCardProps) {
         {agent.paroleTerms && (
           <div className="flex justify-between">
             <span className="text-gray-600 tracking-wider">STRIKES LEFT</span>
-            <span className="text-warden-orange font-bold">
+            <span className="text-sentinel-orange font-bold">
               {agent.paroleTerms.strikesRemaining}
             </span>
           </div>

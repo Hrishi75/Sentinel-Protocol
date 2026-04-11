@@ -54,10 +54,10 @@ export function ActivityFeed() {
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "rgba(0, 229, 204, 0.1)" }}>
         <span
-          className="w-1.5 h-1.5 rounded-full bg-warden-cyan"
+          className="w-1.5 h-1.5 rounded-full bg-sentinel-cyan"
           style={{ animation: "statusBlink 1.5s ease-in-out infinite" }}
         />
-        <span className="font-mono text-[10px] text-warden-cyan tracking-[0.2em]">COMMS INTERCEPT</span>
+        <span className="font-mono text-[10px] text-sentinel-cyan tracking-[0.2em]">COMMS INTERCEPT</span>
         <span className="ml-auto font-mono text-[10px] text-gray-700 tracking-wider">DEVNET</span>
       </div>
 
