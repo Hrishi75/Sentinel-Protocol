@@ -36,6 +36,17 @@ npm start
 4. Click "Select Wallet" in the top nav
 5. Approve the connection
 
+**What happens on connect:**
+- Your account is automatically created in the database (no registration form)
+- You can immediately access the dashboard and register agents
+- A `WalletConnection` record tracks your connection history
+- Your wallet's agents (from the on-chain index) are loaded automatically
+
+**Optional governance profile:**
+- To participate in DAO governance (voting, tribunal), set up your profile via the "GOVERNANCE PROFILE" link in the navbar or `/auth`
+- This adds your callsign, faction (Sentinel/Vanguard/Phantom), and avatar
+- Agent registration does **not** require a governance profile
+
 ---
 
 ## Running Tests

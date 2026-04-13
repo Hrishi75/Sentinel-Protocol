@@ -41,9 +41,25 @@ cd app && npm install && cd ..
 
 ### 3. Set Up the Database
 
-The frontend app uses PostgreSQL via Prisma for off-chain data (payments, profiles, audit logs, on-chain indexes).
+The frontend app uses PostgreSQL via Prisma for off-chain data (wallet connections, payments, profiles, audit logs, on-chain indexes).
 
-**Option A: Docker (Recommended)**
+**Option A: Neon (Recommended — free hosted PostgreSQL)**
+
+1. Sign up at [neon.tech](https://neon.tech) (free, no credit card)
+2. Create a project named `sentinel-protocol`
+3. Copy the connection string and set it in `app/.env.local`:
+
+```env
+DATABASE_URL="postgresql://neondb_owner:<password>@ep-<id>.neon.tech/neondb?sslmode=require"
+```
+
+4. Deploy migrations:
+
+```bash
+cd app && npx prisma migrate deploy
+```
+
+**Option B: Docker (Local)**
 
 ```bash
 docker compose --profile dev up postgres -d
@@ -51,7 +67,7 @@ docker compose --profile dev up postgres -d
 
 This runs PostgreSQL on port **5433** (remapped to avoid conflicts with any local install).
 
-**Option B: Local PostgreSQL**
+**Option C: Local PostgreSQL**
 
 If you already have PostgreSQL running on port 5432:
 
@@ -72,7 +88,7 @@ DATABASE_URL="postgresql://sentinel:sentinel_dev@localhost:5432/sentinel_protoco
 cd app && npx prisma migrate dev --name init
 ```
 
-This creates all 8 tables: `Payment`, `OperativeProfile`, `LinkedWallet`, `AuditLog`, `WebhookEvent`, `IndexedAgent`, `IndexedViolation`, `IndexedBailRequest`.
+This creates all 9 tables: `WalletConnection`, `Payment`, `OperativeProfile`, `LinkedWallet`, `AuditLog`, `WebhookEvent`, `IndexedAgent`, `IndexedViolation`, `IndexedBailRequest`.
 
 **Useful Prisma commands:**
 
@@ -107,8 +123,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_SOLANA_NETWORK=devnet
 NEXT_PUBLIC_RPC_ENDPOINT=https://api.devnet.solana.com
 
-# PostgreSQL (port 5433 for Docker, 5432 for local)
-DATABASE_URL="postgresql://sentinel:sentinel_dev@localhost:5433/sentinel_protocol"
+# PostgreSQL — use Neon (free hosted), Docker (port 5433), or local (port 5432)
+DATABASE_URL="postgresql://neondb_owner:<password>@ep-<id>.neon.tech/neondb?sslmode=require"
 ```
 
 ---

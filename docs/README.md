@@ -6,5 +6,6 @@
 - [Architecture Guide](architecture.md)
 - [Protocol Reference](protocol.md)
 - [Frontend Guide](frontend.md)
+- [Wallet-First Roadmap](wallet-first-roadmap.md)
 - [Troubleshooting Guide](troubleshooting.md)
 - [Contributing](../CONTRIBUTING.md)

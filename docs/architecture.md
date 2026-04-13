@@ -64,19 +64,20 @@ sentinel-protocol/
 │   └── constants.rs                    # PDA seeds, limits, defaults
 ├── app/                                # Next.js frontend + backend
 │   ├── prisma/
-│   │   ├── schema.prisma               # Database schema (8 models)
+│   │   ├── schema.prisma               # Database schema (9 models)
 │   │   └── migrations/                 # Versioned SQL migrations
 │   ├── prisma.config.ts                # Prisma v7 config (datasource URL)
 │   ├── src/
 │   │   ├── app/                        # Pages (Next.js App Router)
 │   │   │   ├── page.tsx                # Landing page
-│   │   │   ├── auth/page.tsx           # Operative registration
+│   │   │   ├── auth/page.tsx           # Optional governance profile setup
 │   │   │   ├── dashboard/page.tsx      # Command Center
 │   │   │   ├── register/page.tsx       # Deploy Agent
-│   │   │   ├── dao/page.tsx            # War Council
+│   │   │   ├── dao/page.tsx            # War Council (governance)
 │   │   │   ├── demo/page.tsx           # Mission Simulation
 │   │   │   ├── docs/page.tsx           # Intel Database
 │   │   │   └── api/                    # Backend API routes
+│   │   │       ├── wallet/connect/     # Wallet connect (auto-creates account)
 │   │   │       ├── payments/           # Checkout, status, payout
 │   │   │       ├── webhooks/dodo/      # Dodo Payments webhook handler
 │   │   │       ├── profiles/           # Operative CRUD, link-wallet
@@ -89,6 +90,7 @@ sentinel-protocol/
 │   │   │   ├── db.ts                   # Prisma client singleton
 │   │   │   ├── payment-store.ts        # Payment persistence (Prisma)
 │   │   │   ├── profile-api.ts          # Client-side profile fetch helpers
+│   │   │   ├── wallet-api.ts           # Client-side wallet connect helper
 │   │   │   ├── audit.ts                # Audit log utility
 │   │   │   ├── program.ts              # Browser Anchor client
 │   │   │   └── program-server.ts       # Server-side read-only Anchor client
@@ -187,6 +189,7 @@ The frontend is paired with a Next.js API-route backend backed by PostgreSQL via
 |---------|----------|------------------------|
 | Agent accountability state | ✅ Source of truth | Mirrored for queries |
 | Violations, bail, DAO votes | ✅ Source of truth | Mirrored for queries |
+| Wallet connections | ❌ | ✅ Persistent (auto-created on connect) |
 | Payment records (Dodo) | ❌ | ✅ Persistent |
 | Operative profiles | ❌ | ✅ Persistent (with localStorage cache) |
 | Audit logs | ❌ | ✅ Persistent |
@@ -196,8 +199,9 @@ The frontend is paired with a Next.js API-route backend backed by PostgreSQL via
 
 | Model | Purpose |
 |-------|---------|
+| `WalletConnection` | Tracks wallet connections — first/last connected, connection count |
 | `Payment` | DodoPay checkout records, status, amounts, agent/owner keys |
-| `OperativeProfile` | Callsign, faction, clearance, XP, avatar, wallet signature |
+| `OperativeProfile` | Wallet address (required), plus optional callsign, faction, clearance, XP, avatar, signature |
 | `LinkedWallet` | Multi-wallet support per profile |
 | `AuditLog` | Action logs — actor, action, target, metadata |
 | `WebhookEvent` | Raw webhook payloads (source, eventType, signature, processedAt) |
@@ -209,11 +213,12 @@ The frontend is paired with a Next.js API-route backend backed by PostgreSQL via
 
 | Route | Method | Purpose |
 |-------|--------|---------|
+| `/api/wallet/connect` | POST | Record wallet connection, auto-create profile, return profile + agents |
 | `/api/payments/checkout` | POST | Create DodoPay checkout session, persist pending payment |
 | `/api/payments/status` | GET | Poll payment status by `payment_id` |
 | `/api/payments/payout` | POST | Request payout (test mode) |
 | `/api/webhooks/dodo` | POST | HMAC-verified webhook handler, updates payment status |
-| `/api/profiles` | GET / POST / DELETE | Operative profile CRUD |
+| `/api/profiles` | GET / POST / DELETE | Operative profile CRUD (all fields optional except walletAddress) |
 | `/api/profiles/link-wallet` | POST / DELETE | Link/unlink secondary wallet |
 | `/api/agents` | GET | Query indexed agents (filter by status, owner) |
 | `/api/agents/[id]` | GET | Single agent + violations |
@@ -234,12 +239,37 @@ POST /api/indexer/run
 
 The indexer uses a server-side read-only Anchor client ([program-server.ts](../app/src/lib/program-server.ts)) with a dummy wallet — it never signs or submits transactions. Trigger it on page load, via cron, or manually.
 
-### Profile Persistence (Dual-Write)
+### Authentication & Profile Flow
 
-Operative profiles are stored in both localStorage (fast reads, offline) and PostgreSQL (cross-device, durable):
+**Wallet connect = account creation.** There is no mandatory registration form. Connecting a wallet auto-creates a minimal `OperativeProfile` in the database (wallet address only). Users can optionally set up a governance profile (callsign, faction, avatar) later via `/auth`.
 
 ```
-signAndCreateProfile()     → localStorage + POST /api/profiles
+Wallet connects
+  └─ POST /api/wallet/connect
+       ├─ Upsert WalletConnection (tracks connection count, timestamps)
+       ├─ Upsert OperativeProfile (auto-create with just walletAddress if new)
+       ├─ Fetch IndexedAgents owned by this wallet
+       └─ Return { connection, profile, agents }
+
+AuthProvider receives response
+  ├─ Sets operative (authenticated immediately)
+  ├─ Sets walletAgents (agents owned by this wallet)
+  └─ Syncs localStorage ↔ server (whichever has richer data wins)
+```
+
+**Two user paths:**
+
+| User Type | Flow |
+|-----------|------|
+| Agent Owner | Connect wallet → Dashboard → Register agents (no profile setup needed) |
+| Governance Participant | Connect wallet → Set up profile (callsign/faction/avatar via `/auth`) → DAO voting |
+
+Profile fields (`callsign`, `faction`, `avatarStyle`, `signature`) are all optional in the database. The `isProfileComplete()` helper checks if all governance fields are set.
+
+**Profile persistence (dual-write):**
+
+```
+signAndCreateProfile()     → localStorage + POST /api/profiles (with wallet signature)
 saveProfile(profile)       → localStorage + POST /api/profiles
 loadProfile(wallet)        → localStorage only (sync)
 loadProfileAsync(wallet)   → localStorage → GET /api/profiles fallback → cache

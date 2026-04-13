@@ -1,66 +1,83 @@
-﻿# Frontend Guide
+# Frontend Guide
 
-Frontend routes, auth flow, and client-side stack.
+Frontend routes, onboarding flow, and client-side stack.
+
 ## Frontend Pages
 
-
-The frontend uses a cyberpunk/HUD gaming theme with military-operative language.
+The frontend uses a cyberpunk/HUD theme with wallet-first onboarding.
 
 | Route | Page | Description |
 |-------|------|-------------|
-| `/` | Landing Page | Mission Control hero, live network graph, activity feed, protocol stats |
-| `/auth` | Operative Registration | Custom auth: wallet signature + callsign/faction/avatar profile |
-| `/dashboard` | Command Center | Agent overview, operative card, radar scan, stat cards |
-| `/register` | Deploy Agent | Form to register new agent with bond and permission scope |
-| `/dao` | War Council | DAO members, tribunal votes, protocol config tabs |
-| `/demo` | Mission Simulation | Step-by-step lifecycle demo with status progression |
+| `/` | Landing Page | Mission Control hero, network visualization, protocol activity |
+| `/dashboard` | Safety Dashboard | Default post-connect experience with personal risk overview and network state |
+| `/register` | Register Agent | Main first action for owners: deploy an agent with bond and guardrails |
+| `/agents/[id]` | Agent Safety Passport | Interpretable trust page for one agent: status, limits, history, insurance |
+| `/auth` | Governance Profile | Optional callsign/faction/avatar setup for governance and reviewer identity |
+| `/profile` | Governance Profile Detail | Manage linked wallets, identity fields, and account reputation |
+| `/dao` | War Council | Governance surfaces for profile-complete users |
+| `/demo` | Mission Simulation | Step-by-step lifecycle demo |
 | `/docs` | Intel Database | Protocol documentation with classified document theme |
 
-All protected pages require wallet connection + operative registration via the AuthGuard component.
+All protected pages require wallet connection. Profile setup is optional and only matters for governance, public identity, and reviewer credibility.
 
 ---
 
-## Custom Auth System
+## Onboarding Model
 
+Sentinel now follows a **wallet connect = account creation** model.
 
-Sentinel Protocol uses a **wallet-based identity system** called "Operative Identity" — no backend required.
+### Default Journey
 
-### How It Works
+1. User connects Phantom or Solflare
+2. Backend auto-creates a lightweight account record on first connect
+3. User lands directly on the Safety Dashboard
+4. User registers or inspects agents immediately
+5. User optionally completes a profile later for governance and social trust features
 
-1. User connects Phantom/Solflare wallet
-2. User fills out a profile: callsign, faction, avatar
-3. Wallet signs a structured message (proves ownership)
-4. Profile is saved to localStorage keyed by wallet address
-5. Protected routes check for both wallet connection and signed profile
+### Product Rules
 
-### Factions
+- Basic safety features must work for wallet-only users
+- Agent registration must not require callsign, faction, or avatar
+- Governance participation can require completed profile fields later
+- Public reviewer reputation is earned through the optional profile path, not forced during onboarding
 
-| Faction | Color | Description |
-|---------|-------|-------------|
-| Sentinel | Cyan | Defensive operatives — monitors and guardians |
-| Vanguard | Orange | Offensive operatives — first responders |
-| Phantom | Purple | Covert operatives — intelligence and recon |
+---
 
-### Progression
+## Dashboard Priorities
 
-- **XP System**: Actions earn experience points
-- **Clearance Levels**: L1 (Recruit) → L2 (Operative) → L3 (Agent) → L4 (Commander) → L5 (Director)
+The default dashboard should answer these questions immediately:
+
+- Do I already have agents?
+- Which of my agents look risky?
+- Which ones are uninsured or have violations?
+- What should I do next?
+
+Core sections:
+
+- `My Agents Risk Overview`
+- `Recommended Actions`
+- `Watchlist Alerts`
+- `Network Overview`
+
+If the wallet has no agent yet, the dashboard should emphasize:
+
+- `Register First Agent`
+- `How Sentinel Protects You`
+- `Complete Profile for Governance` as a secondary path
 
 ---
 
 ## Tech Stack
 
-
 | Layer | Technology |
 |-------|-----------|
-| Smart Contracts | Anchor 0.31.1 (Rust) |
+| Smart Contracts | Anchor |
 | Blockchain | Solana Devnet |
-| Frontend | Next.js 14 (App Router) |
-| Styling | Tailwind CSS 3.4 + custom HUD theme |
+| Frontend | Next.js App Router |
+| Styling | Tailwind CSS + custom HUD theme |
 | Animations | Framer Motion |
-| Wallet | @solana/wallet-adapter (Phantom, Solflare) |
-| Auth | Wallet message signing + localStorage |
-| Agent Simulation | TypeScript (Node.js) |
+| Wallet | `@solana/wallet-adapter` |
+| Auth | Wallet connection + optional signed profile |
+| Persistence | Prisma + PostgreSQL |
+| Agent Simulation | TypeScript |
 | SDK | TypeScript |
-| Containerization | Docker + Docker Compose |
-
